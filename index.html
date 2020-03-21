@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.2/axios.js"></script>
+  <script src="vue.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Lato&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>Document</title>
+  <style> 
+    body {
+      font-family: 'Lato', sans-serif;
+    }
+
+    #app {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .styleMessage {
+      color: dodgerblue;
+    }
+   
+    textarea {
+     width: 50%;
+     height: 100px;
+     border: none;
+     box-shadow: 2px 2px 20px rgba(0,0,0,0.2);
+    }
+
+    input {
+      height: 20px;
+      padding: 10px;
+    }
+    .inputFields{
+      display: grid;
+      grid-template-columns: auto auto;
+      max-width: 500px;
+      grid-column-gap: 10px;
+      grid-row-gap: 20px;
+
+    }
+
+    .buttonsContainer {
+      margin-top: 20px;      
+    }
+
+    #save, #load {
+      width: 150px;
+      font-size: 1.2em;
+      padding: 5px;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+    }
+
+    #save:hover {
+      box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
+    }
+    #load:hover {
+      box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
+    }
+
+    #save {
+      background-color: dodgerblue;
+    }
+    #load {
+      background-color: black;    
+    }
+    #tweet{
+      background-color: dodgerblue;
+      border-radius: 5px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    @media only screen and (max-width: 760px) {
+      .inputFields{
+      grid-template-columns: auto;    
+
+    }
+    
+    }
+
+    
+  </style>
+  
+</head>
+<body>
+  <div id="app">
+    <div class="userInputs">
+      <h1 id="title">ADD CUSTOM STYLES TO YOUR MESSAGES</h1>
+
+      <h4><i>Description: This simple application utilizes the reactivity provided by Vue js to style texts based on user inputs</i></h4>
+
+      <textarea placeholder="Type a message" v-model="userText"></textarea>
+
+      <p :style="styles"> {{userText}}</p>
+      <p>
+        <a :href="tweetText">
+          <button id='tweet'>
+            <i class="fa fa-twitter"></i>Tweet
+          </button>
+        </a>
+        
+      </p>
+      
+      
+      <h5><span class="styleMessage">Style Your Message</span> <small>(Click "Load styles" to restore the styles you previously saved)</small></h5>
+      <div class="inputFields">
+        <input type="text" placeholder="Add Color" v-model="userColor">
+        <input type="text" placeholder="Add Background color" v-model="userBgColor">
+        <input type="text" placeholder="Add width" v-model="userWidth">
+        <input type="text" placeholder="Add Font size" v-model="userFontSize">
+        <input type="text" placeholder="Add Padding" v-model="userPadding">
+        <input type="text" placeholder="Add Border radius" v-model="userBorderRadius">
+      </div>
+      
+      <div class="buttonsContainer">
+        <button @click="save" id="save">Save styles</button>
+        <button @click="load" id="load">Load styles</button>
+      </div>
+        
+    </div>
+  </div>
+
+
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        userText: '',
+        userColor: '',
+        userBgColor: '',
+        userWidth: '',
+        userFontSize: '',
+        userPadding: '',
+        userBorderRadius: '',
+        getData: '',
+
+      
+      },
+      methods: {
+      
+        save(){
+          axios.put('https://vuestyles.firebaseio.com/data.json', this.styles)
+          .then(response=>{
+            console.log(response)
+          })
+        },
+        load(){
+          axios.get('https://vuestyles.firebaseio.com/data.json')
+          .then(response=>{
+           this.getData = JSON.parse(JSON.stringify(response.data));
+           this.userColor = this.getData.color
+            this.userBgColor = this.getData.backgroundColor
+            this.userWidth = this.getData.width
+            this.userPadding = this.getData.padding
+            this.userBorderRadius = this.getData.borderRadius
+            this.userFontSize = this.getData.fontSize
+            console.log(this.getData.color)
+            console.log(JSON.stringify(response.data))
+          })
+        }
+    
+      },
+
+      computed: {
+       
+        styles(){
+
+            return {color: this.userColor, backgroundColor: this.userBgColor,width: this.userWidth , padding: this.userPadding , borderRadius: this.userBorderRadius, fontSize: this.userFontSize}
+          },
+           
+        tweetText(){
+          return 'https://twitter.com/intent/tweet?text=' + this.userText
+        },
+      
+      },
+     
+    })
+
+
+  </script>
+</body>
+</html>
